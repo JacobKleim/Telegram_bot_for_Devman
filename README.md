@@ -43,3 +43,5 @@
    ```
 
 ## Example of work
+
+![tg_example](https://github.com/JacobKleim/Telegram_bot_for_Devman/assets/119351169/4da8f6d9-887b-477b-8a7c-e8681f6f84fa)
