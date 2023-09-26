@@ -18,7 +18,7 @@
 
 2. Create a .env file with parameters:
    ```
-   CHAT_ID=some_token 
+   TG_CHAT_ID=some_token 
    TELEGRAM_TOKEN=some_token
    DEVMAN_TOKEN=some_token
    ```

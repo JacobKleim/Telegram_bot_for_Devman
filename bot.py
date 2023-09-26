@@ -1,3 +1,4 @@
+import argparse
 import os
 import requests
 
@@ -5,28 +6,25 @@ from telegram import Bot
 from dotenv import load_dotenv
 
 
-def send_message(id, tg_token, massage):
-    bot = Bot(token=tg_token)
-    bot.send_message(id, massage)
-
-
-def homework_status(id, tg_token, dm_token):
+def get_homework_status(tg_chat_id, tg_token, dm_token):
     timestamp = None
     params = {}
-    devman_token = {'Authorization': f'Token {dm_token}'}
+    header = {'Authorization': f'Token {dm_token}'}
     url_homework_info = 'https://dvmn.org/api/long_polling/'
     negative_text = 'не принята. Кое-что нужно доработать'
     positive_text = 'принята'
-
+    bot = Bot(token=tg_token)
     while True:
         if timestamp:
             params['timestamp'] = timestamp
         response = requests.get(url_homework_info,
-                                headers=devman_token,
+                                headers=header,
                                 params=params)
-        data = response.json()
-        if 'new_attempts' in data:
-            new_attempt = data['new_attempts'][0]
+        response.raise_for_status()
+        response_data = response.json()
+        print(response.text)
+        if 'new_attempts' in response_data:
+            new_attempt = response_data['new_attempts'][0]
             is_negative = new_attempt['is_negative']
             lesson_title = new_attempt['lesson_title']
             lesson_url = new_attempt['lesson_url']
@@ -35,27 +33,39 @@ def homework_status(id, tg_token, dm_token):
             else:
                 result = positive_text
             massage = f'Работа "{lesson_title}" {result}. {lesson_url}'
-            send_message(id, tg_token, massage=massage)
-            timestamp = response.json()['last_attempt_timestamp']
+            bot.send_message(tg_chat_id, massage)
+            timestamp = response_data['last_attempt_timestamp']
         else:
-            timestamp = response.json()['timestamp_to_request']
+            timestamp = response_data['timestamp_to_request']
 
 
-if __name__ == '__main__':
-
+def main():
     load_dotenv()
 
-    chat_id = os.environ.get('CHAT_ID')
+    parser = argparse.ArgumentParser()
 
-    if not chat_id:
-        chat_id = input('Ведите chat_id: ')
+    parser.add_argument('-c', '--chat_id',
+                        type=int, help='The chat ID to use.')
+
+    args = parser.parse_args()
+
+    tg_chat_id = os.environ.get('TG_CHAT_ID')
+
+    if not tg_chat_id:
+        tg_chat_id = args.chat_id
 
     tg_token = os.environ['TELEGRAM_TOKEN']
     dm_token = os.environ['DEVMAN_TOKEN']
 
     try:
-        homework_status(chat_id, tg_token, dm_token)
+        get_homework_status(tg_chat_id, tg_token, dm_token)
     except ConnectionError as con_error:
         print(con_error)
     except requests.exceptions.ReadTimeout as rt_error:
         print(rt_error)
+    except Exception as e:
+        print(e)
+
+
+if __name__ == '__main__':
+    main()
