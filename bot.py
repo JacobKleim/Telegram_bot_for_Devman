@@ -57,14 +57,15 @@ def main():
     tg_token = os.environ['TELEGRAM_TOKEN']
     dm_token = os.environ['DEVMAN_TOKEN']
 
-    try:
-        get_homework_status(tg_chat_id, tg_token, dm_token)
-    except ConnectionError as con_error:
-        print(con_error)
-    except requests.exceptions.ReadTimeout as rt_error:
-        print(rt_error)
-    except Exception as e:
-        print(e)
+    while True:
+        try:
+            get_homework_status(tg_chat_id, tg_token, dm_token)
+        except ConnectionError as con_error:
+            print(con_error)
+        except requests.exceptions.ReadTimeout as rt_error:
+            print(rt_error)
+        except Exception as e:
+            print(e)
 
 
 if __name__ == '__main__':
