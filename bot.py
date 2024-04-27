@@ -6,6 +6,20 @@ import time
 from telegram import Bot
 from dotenv import load_dotenv
 
+import logging
+
+
+class TelegramLogsHandler(logging.Handler):
+
+    def __init__(self, tg_token, chat_id):
+        super().__init__()
+        self.chat_id = chat_id
+        self.tg_bot = Bot(token=tg_token)
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
+
 
 def get_homework_status(tg_chat_id, tg_token, dm_token, timestamp):
     params = {}
@@ -57,6 +71,13 @@ def main():
     retry_count = 0
     timestamp = None
 
+    telegram_handler = TelegramLogsHandler(tg_token, tg_chat_id)
+    telegram_handler.setLevel(logging.DEBUG)
+    logger = logging.getLogger()
+    logger.addHandler(telegram_handler)
+    logger.setLevel(logging.INFO)
+    logger.info('Bot started')
+
     while True:
         try:
             timestamp = get_homework_status(tg_chat_id,
@@ -65,15 +86,15 @@ def main():
                                             timestamp)
             retry_count = 0
         except ConnectionError as con_error:
-            print(con_error)
+            logger.error(f'Error{con_error}')
             retry_count += 1
             if retry_count >= max_retries:
                 time.sleep(30)
                 retry_count = 0
         except requests.exceptions.ReadTimeout as rt_error:
-            print(rt_error)
+            logger.error(f'Error{rt_error}')
         except Exception as e:
-            print(e)
+            logger.error(f'Error{e}')
 
 
 if __name__ == '__main__':

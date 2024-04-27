@@ -4,14 +4,14 @@
  - This telegram bot is sent a notification about checking homework.
 
 ## Technologies and tools
- - Python
+ - Python 3.9.10
 
 ## How to use
 1. Clone this repository and go to the project folder:
    ```bash
    cd /c/project_folder # for example
    
-   git clone https://github.com/JacobKleim/Telegram_bot_for_Devman
+   git clone github.com/JacobKleim/Telegram_bot_for_Devman
    
    cd /c/project_folder/Telegram_bot_for_Devman 
    ```
@@ -25,21 +25,21 @@
 
 3. Сreate and activate a virtual environment:
    ```bash
-   python -m venv venv 
+   python3 -m venv venv 
    
-   source venv/Scripts/activate
+   source venv/bin/activate
    ```
 
 4. Install dependencies:
    ```bash
-   python -m pip install --upgrade pip
+   python3 -m pip install --upgrade pip
 
    pip install -r requirements.txt
    ```
 
 5. Start the project:
    ```bash
-   python bot.py
+   python3 bot.py
    ```
 
 ## Example of work
