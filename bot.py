@@ -9,6 +9,9 @@ from dotenv import load_dotenv
 import logging
 
 
+logger = logging.getLogger()
+
+
 class TelegramLogsHandler(logging.Handler):
 
     def __init__(self, tg_token, chat_id):
@@ -22,6 +25,7 @@ class TelegramLogsHandler(logging.Handler):
 
 
 def get_homework_status(tg_chat_id, tg_token, dm_token, timestamp):
+    logger.info('Bot started')
     params = {}
     header = {'Authorization': f'Token {dm_token}'}
     url_homework_info = 'https://dvmn.org/api/long_polling/'
@@ -73,10 +77,8 @@ def main():
 
     telegram_handler = TelegramLogsHandler(tg_token, tg_chat_id)
     telegram_handler.setLevel(logging.DEBUG)
-    logger = logging.getLogger()
     logger.addHandler(telegram_handler)
     logger.setLevel(logging.INFO)
-    logger.info('Bot started')
 
     while True:
         try:
